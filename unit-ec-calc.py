@@ -137,11 +137,12 @@ def ue_input(i, f):
 
 def calculating(i):
     unitec.loc[i, 'Buyers'] = unitec.loc[i, 'User Aquisition'] * unitec.loc[i, 'Convert to purchase']
-    unitec.loc[i, 'AvPrice'] = unitec.loc[i, 'iPrice'] / unitec.loc[i, 'iCount']
+    unitec.loc[i, 'AvPrice'] = round(unitec.loc[i, 'iPrice'] / unitec.loc[i, 'iCount'], 2)
     unitec.loc[i, 'Marketing cost'] = unitec.loc[i, 'User Aquisition'] * unitec.loc[i, 'Cost per Acquisition']
-    unitec.loc[i, 'COGS, total'] = unitec.loc[i, 'AvPrice'] * unitec.loc[i, 'COGS, %'] + unitec.loc[i, 'COGS, fix']
-    unitec.loc[i, 'AvRevenue per Customer'] = (unitec.loc[i, 'AvPrice'] - unitec.loc[i, 'COGS, total']) * \
-                                              unitec.loc[i, 'AvPaymentCount'] - unitec.loc[i, '1stCOGS']
+    unitec.loc[i, 'COGS, total'] = round(unitec.loc[i, 'AvPrice'] * unitec.loc[i, 'COGS, %'] +
+                                         unitec.loc[i, 'COGS, fix'], 2)
+    unitec.loc[i, 'AvRevenue per Customer'] = round((unitec.loc[i, 'AvPrice'] - unitec.loc[i, 'COGS, total']) *
+                                                    unitec.loc[i, 'AvPaymentCount'] - unitec.loc[i, '1stCOGS'], 2)
     unitec.loc[i, 'AvRevenue per User'] = unitec.loc[i, 'AvRevenue per Customer'] * unitec.loc[i, 'Convert to purchase']
     unitec.loc[i, 'Contribution Margin'] = unitec.loc[i, 'User Aquisition'] * (unitec.loc[i, 'AvRevenue per User'] -
                                                                                unitec.loc[i, 'Cost per Acquisition'])
@@ -154,7 +155,14 @@ def calculating(i):
                                                                                  unitec.loc[i, 'User Aquisition']))
     else:
         print('После вычета расходов, вы выходите в ноль')
-    time.sleep(3)
+    if i > 0:
+        time.sleep(1)
+        print('Все текущие расчёты:')
+        print(unitec.loc[:i, 'Contribution Margin'].to_string())
+        print('-------------------------------------------')
+        time.sleep(3)
+    else:
+        time.sleep(3)
 
 
 def choose_step():
@@ -194,9 +202,9 @@ def step_one():
             if len(t) not in [1, 2]:
                 raise SyntaxError("Допускается дефис только между двумя числами. Например: 5-8")
             r.add(int(t[0])) if len(t) == 1 else r.update(set(range(int(t[0]), int(t[1]) + 1)))
-        l = list(r)
-        l.sort()
-        return l
+        numbers = list(r)
+        numbers.sort()
+        return numbers
 
     replace = hyph_range(input('Введите номера значений из предыдущего расчёта, которые хотите заменить. \n'
                                'Используйте запятую и дефис для перечисления. Пример: 1, 2-5\n'
